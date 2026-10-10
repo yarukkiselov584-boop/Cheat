@@ -1,5 +1,5 @@
 -- ==========================================================
--- UNIVERSAL ESP + AIMBOT + MINIMAP
+-- UNIVERSAL ESP + AIMBOT + MINIMAP + POTATO MODE
 -- ==========================================================
 
 local Players = game:GetService("Players")
@@ -48,14 +48,15 @@ local Config = {
         Enabled = true,
         Size = 150,
         Position = UDim2.new(1, -170, 0, 20),
-        Scale = 0.5, -- 1 stud = 0.5 pixels
+        Scale = 0.5,
     }
 }
 
 local LocalTeam = LocalPlayer.Team
+LocalPlayer:GetPropertyChangedSignal("Team"):Connect(function() LocalTeam = LocalPlayer.Team end)
 
 -- ==========================================================
--- МЕНЮ (УКРАЇНСЬКОЮ)
+-- МЕНЮ
 -- ==========================================================
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "NeoMenuUA"
@@ -95,7 +96,6 @@ Title.Font = Enum.Font.GothamBold
 Title.TextSize = 16
 Title.TextXAlignment = Enum.TextXAlignment.Left
 
--- Перетягування
 local dragging, dragStart, startPos
 Header.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -118,7 +118,7 @@ TabsBar.Position = UDim2.new(0, 10, 0, 50)
 TabsBar.BackgroundTransparency = 1
 local TabsLayout = Instance.new("UIListLayout", TabsBar)
 TabsLayout.FillDirection = Enum.FillDirection.Horizontal
-TabsLayout.Padding = UDim.new(0, 5)
+TabsLayout.Padding = UDim.new(0, 4)
 
 local Content = Instance.new("Frame", Main)
 Content.Size = UDim2.new(1, -20, 1, -95)
@@ -144,12 +144,12 @@ end
 
 local function createTabButton(name)
     local btn = Instance.new("TextButton", TabsBar)
-    btn.Size = UDim2.new(0, 90, 1, 0)
+    btn.Size = UDim2.new(0, 72, 1, 0)
     btn.BackgroundColor3 = Colors.Bg2
     btn.Text = name
     btn.TextColor3 = Colors.TextDim
     btn.Font = Enum.Font.GothamSemibold
-    btn.TextSize = 13
+    btn.TextSize = 12
     btn.BorderSizePixel = 0
     Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
     btn.MouseButton1Click:Connect(function()
@@ -164,7 +164,7 @@ local function createTabButton(name)
     return btn
 end
 
-local tabs = { "Головна", "ESP", "Аім", "Міні-карта", "Різне" }
+local tabs = { "Головна", "ESP", "Аім", "Карта", "Різне" }
 for _, t in ipairs(tabs) do createPage(t) end
 local firstTab
 for _, t in ipairs(tabs) do
@@ -175,7 +175,9 @@ pages["Головна"].Visible = true
 firstTab.TextColor3 = Colors.Accent
 firstTab.BackgroundColor3 = Colors.Bg
 
+-- ==========================================================
 -- ЕЛЕМЕНТИ
+-- ==========================================================
 local function makeToggle(page, text, default, callback)
     local btn = Instance.new("TextButton", page)
     btn.Size = UDim2.new(1, 0, 0, 34)
@@ -325,11 +327,12 @@ end
 -- ==========================================================
 -- НАПОВНЕННЯ
 -- ==========================================================
-local pMain, pESP, pAim, pMap, pMisc = pages["Головна"], pages["ESP"], pages["Аім"], pages["Міні-карта"], pages["Різне"]
+local pMain, pESP, pAim, pMap, pMisc = pages["Головна"], pages["ESP"], pages["Аім"], pages["Карта"], pages["Різне"]
 
 makeSection(pMain, "Загальне")
 makeToggle(pMain, "Увімкнути ESP", false, function(v) Config.ESP.Enabled = v end)
 makeToggle(pMain, "Увімкнути Аімбот", false, function(v) Config.Aimbot.Enabled = v end)
+makeToggle(pMain, "Увімкнути Міні-карту", true, function(v) Config.Minimap.Enabled = v end)
 
 makeSection(pESP, "Елементи")
 makeToggle(pESP, "Бокс", true, function(v) Config.ESP.Box = v end)
@@ -340,22 +343,21 @@ makeToggle(pESP, "Здоров'я", true, function(v) Config.ESP.Health = v end)
 makeToggle(pESP, "Смуга HP", true, function(v) Config.ESP.HealthBar = v end)
 makeToggle(pESP, "Дистанція", true, function(v) Config.ESP.Distance = v end)
 makeToggle(pESP, "Перевірка команди", true, function(v) Config.ESP.TeamCheck = v end)
-
 makeSection(pESP, "Налаштування")
 makeSlider(pESP, "Товщина ліній", 1, 5, 2, function(v) Config.ESP.LineThickness = v end)
 makeSlider(pESP, "Макс. дистанція", 100, 5000, 1000, function(v) Config.ESP.MaxDistance = v end)
+makeDropdown(pESP, "Лінії з", {"Bottom", "Top", "Center"}, "Bottom", function(v) Config.ESP.LineFrom = v end)
 
 makeSection(pAim, "Загальне")
 makeToggle(pAim, "Аімбот", false, function(v) Config.Aimbot.Enabled = v end)
 makeToggle(pAim, "Показувати FOV", true, function(v) Config.Aimbot.ShowFOV = v end)
 makeToggle(pAim, "Перевірка команди", true, function(v) Config.Aimbot.TeamCheck = v end)
 makeToggle(pAim, "Перевірка стін", true, function(v) Config.Aimbot.WallCheck = v end)
-
 makeSection(pAim, "Налаштування")
 makeSlider(pAim, "FOV", 20, 600, 150, function(v) Config.Aimbot.FOV = v end)
 makeSlider(pAim, "Плавність", 5, 100, 35, function(v) Config.Aimbot.Smoothness = v / 100 end)
 makeDropdown(pAim, "Частина тіла", {"Head", "Torso", "UpperTorso", "HumanoidRootPart", "Nearest"}, "Head", function(v) Config.Aimbot.Part = v end)
-makeDropdown(pAim, "Клавіша активації", {"MouseButton2", "E", "Q", "CapsLock"}, "MouseButton2", function(v)
+makeDropdown(pAim, "Клавіша", {"MouseButton2", "E", "Q", "CapsLock"}, "MouseButton2", function(v)
     Config.Aimbot.Key = Enum.UserInputType[v] or Enum.KeyCode[v] or Enum.UserInputType.MouseButton2
 end)
 
@@ -381,22 +383,97 @@ makeSlider(pMisc, "Сила стрибка", 50, 300, 50, function(v)
     if hum then hum.JumpPower = v; hum.UseJumpPower = true end
 end)
 
+-- ==========================================================
+-- 🥔 POTATO MODE — повне очищення графики
+-- ==========================================================
+local function enablePotatoMode()
+    pcall(function()
+        -- Освітлення
+        Lighting.GlobalShadows = false
+        Lighting.Brightness = 0.5
+        Lighting.EnvironmentDiffuseScale = 0
+        Lighting.EnvironmentSpecularScale = 0
+        Lighting.OutdoorAmbient = Color3.fromRGB(80, 80, 80)
+        Lighting.Ambient = Color3.fromRGB(60, 60, 60)
+        Lighting.FogEnd = 500
+        Lighting.FogStart = 0
+
+        -- Пост-ефекти (Blur, Bloom, DOF, SunRays, ColorCorrection)
+        for _, v in ipairs(Lighting:GetChildren()) do
+            if v:IsA("PostEffect") or v:IsA("Atmosphere") or v:IsA("Sky") then
+                v.Enabled = false
+            end
+        end
+
+        -- Вода
+        local Terrain = workspace:FindFirstChildOfClass("Terrain")
+        if Terrain then
+            Terrain.WaterWaveSize = 0
+            Terrain.WaterWaveSpeed = 0
+            Terrain.WaterReflectance = 0
+            Terrain.WaterTransparency = 1
+            pcall(function() Terrain.Decoration = false end)
+        end
+
+        -- Частинки, текстури, матеріали (в фоні, щоб не лагало)
+        task.spawn(function()
+            local processed = 0
+            for _, obj in ipairs(workspace:GetDescendants()) do
+                -- Частинки — видаляємо
+                if obj:IsA("ParticleEmitter") or obj:IsA("Trail")
+                    or obj:IsA("Fire") or obj:IsA("Smoke")
+                    or obj:IsA("Sparkles") or obj:IsA("Beam")
+                    or obj:IsA("Explosion") then
+                    obj.Enabled = false
+
+                -- Текстури/декалі — прозорі
+                elseif obj:IsA("Decal") or obj:IsA("Texture") then
+                    obj.Transparency = 1
+
+                -- Меші — спрощуємо
+                elseif obj:IsA("SpecialMesh") or obj:IsA("MeshPart") then
+                    pcall(function() obj.TextureId = "" end)
+
+                -- Частини — прибираємо відображення, тіні
+                elseif obj:IsA("BasePart") then
+                    obj.Material = Enum.Material.SmoothPlastic
+                    obj.Reflectance = 0
+                    obj.CastShadow = false
+                end
+
+                processed += 1
+                if processed % 200 == 0 then task.wait() end
+            end
+        end)
+
+        -- Обмеження FPS
+        if setfpscap then pcall(function() setfpscap(60) end) end
+
+        -- Прибираємо небо
+        pcall(function()
+            Lighting:ClearAllChildren()
+        end)
+
+        print("🥔 Potato Mode ON")
+    end)
+end
+
+local function disablePotatoMode()
+    pcall(function()
+        Lighting.GlobalShadows = true
+        Lighting.Brightness = 2
+        print("🥔 Potato Mode OFF")
+    end)
+end
+
 makeSection(pMisc, "Продуктивність")
 makeToggle(pMisc, "🥔 Картопляний режим", false, function(v)
     Config.Misc.PotatoMode = v
-    if v then
-        pcall(function()
-            Lighting.GlobalShadows = false
-            Lighting.Brightness = 1
-            for _, v in ipairs(Lighting:GetChildren()) do
-                if v:IsA("PostEffect") then v.Enabled = false end
-            end
-        end)
-    end
+    if v then enablePotatoMode() else disablePotatoMode() end
 end)
 
 -- ==========================================================
--- ESP DRAWING (ВИПРАВЛЕНО)
+-- ESP DRAWING
 -- ==========================================================
 local ESPData = {}
 local hasDrawing = pcall(function() return Drawing.new("Line") end)
@@ -426,12 +503,11 @@ Players.PlayerAdded:Connect(createESP)
 Players.PlayerRemoving:Connect(removeESP)
 for _, p in ipairs(Players:GetPlayers()) do createESP(p) end
 
--- FOV CIRCLE
 local fovCircle
 if hasDrawing then
     fovCircle = Drawing.new("Circle")
     fovCircle.Thickness = 1.5
-    fovCircle.NumSides = 64
+    fovCircle.NumSides = 48
     fovCircle.Filled = false
     fovCircle.Color = Color3.fromRGB(160, 100, 255)
     fovCircle.Visible = false
@@ -445,7 +521,7 @@ local MinimapFrame = Instance.new("Frame", ScreenGui)
 MinimapFrame.Size = UDim2.new(0, Config.Minimap.Size, 0, Config.Minimap.Size)
 MinimapFrame.Position = Config.Minimap.Position
 MinimapFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
-MinimapFrame.BackgroundTransparency = 0.3
+MinimapFrame.BackgroundTransparency = 0.4
 MinimapFrame.BorderSizePixel = 1
 MinimapFrame.BorderColor3 = Colors.Accent
 MinimapFrame.Visible = Config.Minimap.Enabled
@@ -455,17 +531,12 @@ local MinimapDots = {}
 local function updateMinimap()
     if not Config.Minimap.Enabled then MinimapFrame.Visible = false return end
     MinimapFrame.Visible = true
-    
     local localRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
     if not localRoot then return end
-
     local origin = localRoot.Position
     local scale = Config.Minimap.Scale
-    
-    -- Очищення старих точок
     for _, dot in pairs(MinimapDots) do dot:Destroy() end
     MinimapDots = {}
-    
     for _, p in ipairs(Players:GetPlayers()) do
         if p ~= LocalPlayer and p.Character then
             local root = p.Character:FindFirstChild("HumanoidRootPart")
@@ -484,7 +555,7 @@ local function updateMinimap()
 end
 
 -- ==========================================================
--- HELPERS & MAIN LOOP
+-- HELPERS
 -- ==========================================================
 local function getPart(char)
     if not char then return nil end
@@ -512,13 +583,15 @@ local function isVisible(part)
 end
 
 local function isTeammate(player)
-    if not Config.Aimbot.TeamCheck and not Config.ESP.TeamCheck then return false end
     if not LocalTeam or not player.Team then return false end
     return player.Team == LocalTeam
 end
 
+-- ==========================================================
+-- MAIN LOOP
+-- ==========================================================
 RunService.RenderStepped:Connect(function()
-    -- ESP UPDATE
+    -- ESP
     if Config.ESP.Enabled and hasDrawing then
         for player, data in pairs(ESPData) do
             local char = player.Character
@@ -539,6 +612,9 @@ RunService.RenderStepped:Connect(function()
                     local height = math.abs(bottomY - topY)
                     local width = height * 0.55
 
+                    data.box.Thickness = Config.ESP.LineThickness
+                    data.tracer.Thickness = Config.ESP.LineThickness
+
                     if Config.ESP.Box then
                         data.outline.Size = Vector2.new(width, height); data.outline.Position = Vector2.new(rootPos.X - width/2, topY); data.outline.Visible = Config.ESP.Outline
                         data.box.Size = Vector2.new(width, height); data.box.Position = Vector2.new(rootPos.X - width/2, topY)
@@ -553,8 +629,8 @@ RunService.RenderStepped:Connect(function()
                         data.tracer.Visible = true
                     else data.tracer.Visible = false end
 
-                    if Config.ESP.Name then data.name.Text = player.Name; data.name.Size = 14; data.name.Position = Vector2.new(rootPos.X, topY - 16); data.name.Visible = true else data.name.Visible = false end
-                    if Config.ESP.Health then data.hpText.Text = "❤ " .. math.floor(hum.Health) .. " / " .. math.floor(hum.MaxHealth); data.hpText.Size = 13; data.hpText.Position = Vector2.new(rootPos.X, bottomY + 2); data.hpText.Visible = true else data.hpText.Visible = false end
+                    if Config.ESP.Name then data.name.Text = player.Name; data.name.Position = Vector2.new(rootPos.X, topY - 16); data.name.Visible = true else data.name.Visible = false end
+                    if Config.ESP.Health then data.hpText.Text = "❤ " .. math.floor(hum.Health) .. " / " .. math.floor(hum.MaxHealth); data.hpText.Position = Vector2.new(rootPos.X, bottomY + 2); data.hpText.Visible = true else data.hpText.Visible = false end
 
                     if Config.ESP.HealthBar then
                         local barX = rootPos.X - width/2 - 8
@@ -563,7 +639,7 @@ RunService.RenderStepped:Connect(function()
                         data.hpBar.From = Vector2.new(barX, bottomY - fill); data.hpBar.To = Vector2.new(barX, bottomY); data.hpBar.Visible = true
                     else data.hpBarBg.Visible = false; data.hpBar.Visible = false end
 
-                    if Config.ESP.Distance then data.distText.Text = "[" .. math.floor(dist) .. "m]"; data.distText.Size = 12; data.distText.Position = Vector2.new(rootPos.X, topY - 30); data.distText.Visible = true else data.distText.Visible = false end
+                    if Config.ESP.Distance then data.distText.Text = "[" .. math.floor(dist) .. "m]"; data.distText.Position = Vector2.new(rootPos.X, topY - 30); data.distText.Visible = true else data.distText.Visible = false end
                 end
             end
         end
@@ -571,13 +647,14 @@ RunService.RenderStepped:Connect(function()
         for _, data in pairs(ESPData) do for _, obj in pairs(data) do pcall(function() obj.Visible = false end) end end
     end
 
-    -- AIMBOT UPDATE
+    -- FOV
     if fovCircle then
         fovCircle.Radius = Config.Aimbot.FOV
         fovCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
         fovCircle.Visible = Config.Aimbot.Enabled and Config.Aimbot.ShowFOV
     end
 
+    -- AIMBOT
     local keyActive = false
     if typeof(Config.Aimbot.Key) == "EnumItem" then
         if Config.Aimbot.Key.EnumType == Enum.UserInputType then keyActive = UserInputService:IsMouseButtonPressed(Config.Aimbot.Key)
@@ -605,18 +682,16 @@ RunService.RenderStepped:Connect(function()
         end
         if closest then
             local targetPos = closest.Position
-            local sp = Camera:WorldToViewportPoint(targetPos)
-            local delta = Vector2.new(sp.X, sp.Y) - mousePos
             local camCF = Camera.CFrame
             Camera.CFrame = camCF:Lerp(CFrame.new(camCF.Position, targetPos), math.clamp(Config.Aimbot.Smoothness, 0, 1))
         end
     end
 
-    -- MINIMAP UPDATE
+    -- MINIMAP
     updateMinimap()
 end)
 
--- CONTROLS
+-- КНОПКА МЕНЮ
 UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
     if input.KeyCode == Enum.KeyCode.K then
@@ -628,4 +703,19 @@ UserInputService.InputBegan:Connect(function(input, gpe)
             TweenService:Create(Main, TweenInfo.new(0.2, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0, 400, 0, 480)}):Play()
         end
     end
+end)
+
+-- РЕСПАВН
+LocalPlayer.CharacterAdded:Connect(function(char)
+    local hum = char:WaitForChild("Humanoid", 5)
+    if hum then
+        task.wait(0.5)
+        hum.WalkSpeed = Config.Misc.WalkSpeed
+        hum.JumpPower = Config.Misc.JumpPower
+        hum.UseJumpPower = true
+    end
+end)
+
+pcall(function()
+    game.StarterGui:SetCore("SendNotification", {Title = "✨ Neo Menu", Text = "Press K", Duration = 5})
 end)

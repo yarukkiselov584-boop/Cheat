@@ -3,7 +3,7 @@ local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
 
 -- ⚙️ НАЛАШТУВАННЯ
-local KEY_LIST_URL = "https://твій-сайт/keys.json"  -- або raw GitHub/Pastebin
+local KEY_LIST_URL = "https://raw.githubusercontent.com/yarukkiselov584-boop/Cheat/main/keys.json" -- або raw GitHub/Pastebin
 local HWID = game:GetService("RbxAnalyticsService"):GetClientId()  -- унікальний ID пристрою
 
 -- Отримуємо базу ключів

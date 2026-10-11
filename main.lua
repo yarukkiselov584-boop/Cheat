@@ -1,6 +1,6 @@
 -- ==========================================================
--- NEO MENU v6 — FULL AUTO
--- ESP + Aimbot + AutoShoot + TriggerBot + Minimap + Potato
+-- NEO MENU v7 — POTATO BOOST
+-- ESP + Aimbot + AutoShoot + TriggerBot + Minimap + 2x Potato
 -- ==========================================================
 
 local Players = game:GetService("Players")
@@ -33,7 +33,7 @@ local Config = {
         Smoothness=0.35, Part="Head", TeamCheck=true, WallCheck=true,
         IgnoreDead=true, IgnoreKnocked=true,
         Prediction=false, PredictionAmount=0.15, MaxDistance=1000,
-        Method="Camera", ShowTarget=true, TargetColor=Color3.fromRGB(255,100,100),
+        Method="Camera",
     },
     AutoShoot = {
         Enabled=false, Key=Enum.UserInputType.MouseButton1, Delay=0.1,
@@ -49,7 +49,8 @@ local Config = {
     },
     Misc = {
         WalkSpeed=16, JumpPower=50, Fullbright=false, Noclip=false,
-        PotatoMode=false, ShowFPS=true, ShowPing=true,
+        PotatoMode=false, ExtremePotato=false,
+        ShowFPS=true, ShowPing=true,
     },
     Minimap = { Enabled=true, Size=150, Scale=0.5, DotSize=6 }
 }
@@ -128,7 +129,7 @@ Title.TextXAlignment = Enum.TextXAlignment.Left
 
 local Subtitle = Instance.new("TextLabel", Header)
 Subtitle.Size = UDim2.new(1, -120, 0, 14); Subtitle.Position = UDim2.new(0, 59, 0, 32)
-Subtitle.BackgroundTransparency = 1; Subtitle.Text = "Laplace  Edition  •  v6  •  FULL AUTO"
+Subtitle.BackgroundTransparency = 1; Subtitle.Text = "v7  •  POTATO BOOST"
 Subtitle.TextColor3 = P.TextDim; Subtitle.Font = Enum.Font.Gotham; Subtitle.TextSize = 11
 Subtitle.TextXAlignment = Enum.TextXAlignment.Left
 
@@ -420,12 +421,11 @@ local pMain, pESP, pAim, pAuto, pMap, pMisc = pages["Головна"], pages["ES
 makeSection(pMain, "Загальне")
 makeToggle(pMain, "Увімкнути ESP", false, function(v) Config.ESP.Enabled = v end)
 makeToggle(pMain, "Увімкнути Аімбот", false, function(v) Config.Aimbot.Enabled = v end)
-makeToggle(pMain, "Увімкнути Авто-постріл", false, function(v) Config.AutoShoot.Enabled = v end)
-makeToggle(pMain, "Увімкнути Тригер-бот", false, function(v) Config.TriggerBot.Enabled = v end)
+makeToggle(pMain, "Увімкнути Auto-Shoot", false, function(v) Config.AutoShoot.Enabled = v end)
+makeToggle(pMain, "Увімкнути Trigger-Bot", false, function(v) Config.TriggerBot.Enabled = v end)
 makeToggle(pMain, "Увімкнути Aim on Shoot", false, function(v) Config.AimOnShoot.Enabled = v end)
 makeToggle(pMain, "Увімкнути Міні-карту", true, function(v) Config.Minimap.Enabled = v end)
 
--- ESP
 makeSection(pESP, "Елементи")
 makeToggle(pESP, "Бокс", true, function(v) Config.ESP.Box = v end)
 makeToggle(pESP, "Обводка", true, function(v) Config.ESP.Outline = v end)
@@ -449,7 +449,6 @@ makeColor(pESP, "Колір союзника", Color3.fromRGB(80,200,255), funct
 makeColor(pESP, "Колір мертвого", Color3.fromRGB(130,130,130), function(c) Config.ESP.DeadColor = c end)
 makeDropdown(pESP, "Лінії з", {"Bottom","Top","Center"}, "Bottom", function(v) Config.ESP.LineFrom = v end)
 
--- AIM
 makeSection(pAim, "Загальне")
 makeToggle(pAim, "Аімбот", false, function(v) Config.Aimbot.Enabled = v end)
 makeToggle(pAim, "Показувати FOV", true, function(v) Config.Aimbot.ShowFOV = v end)
@@ -472,7 +471,6 @@ makeToggle(pAim, "Перевірка стін", true, function(v) Config.Aimbot.
 makeToggle(pAim, "Prediction", false, function(v) Config.Aimbot.Prediction = v end)
 makeSlider(pAim, "Prediction сила", 0, 50, 15, function(v) Config.Aimbot.PredictionAmount = v / 100 end)
 
--- AUTO
 makeSection(pAuto, "Auto-Shoot (авто-постріл)")
 makeToggle(pAuto, "Увімкнути Auto-Shoot", false, function(v) Config.AutoShoot.Enabled = v end)
 makeToggle(pAuto, "Тільки коли Аім активний", false, function(v) Config.AutoShoot.OnlyWhenAimActive = v end)
@@ -482,14 +480,14 @@ makeSlider(pAuto, "Затримка (мс×10)", 1, 50, 10, function(v) Config.A
 makeSlider(pAuto, "Кулдаун (мс×10)", 1, 50, 15, function(v) Config.AutoShoot.Cooldown = v / 100 end)
 makeSlider(pAuto, "Макс. дистанція", 100, 5000, 1000, function(v) Config.AutoShoot.MaxDistance = v end)
 
-makeSection(pAuto, "Trigger-Bot (постріл коли приціл на ворогу)")
+makeSection(pAuto, "Trigger-Bot")
 makeToggle(pAuto, "Увімкнути Trigger-Bot", false, function(v) Config.TriggerBot.Enabled = v end)
 makeToggle(pAuto, "Перевірка команди (TB)", true, function(v) Config.TriggerBot.TeamCheck = v end)
 makeToggle(pAuto, "Перевірка стін (TB)", true, function(v) Config.TriggerBot.WallCheck = v end)
 makeSlider(pAuto, "Затримка (мс×10)", 1, 30, 5, function(v) Config.TriggerBot.Delay = v / 100 end)
 makeSlider(pAuto, "Макс. дистанція (TB)", 100, 5000, 1000, function(v) Config.TriggerBot.MaxDistance = v end)
 
-makeSection(pAuto, "Aim on Shoot (наводка під час пострілу)")
+makeSection(pAuto, "Aim on Shoot")
 makeToggle(pAuto, "Увімкнути Aim on Shoot", false, function(v) Config.AimOnShoot.Enabled = v end)
 makeToggle(pAuto, "Перевірка команди (AoS)", true, function(v) Config.AimOnShoot.TeamCheck = v end)
 makeToggle(pAuto, "Перевірка стін (AoS)", true, function(v) Config.AimOnShoot.WallCheck = v end)
@@ -499,17 +497,15 @@ end)
 makeDropdown(pAuto, "Частина тіла (AoS)", {"Head","Torso","UpperTorso","HumanoidRootPart","Nearest"}, "Head", function(v) Config.AimOnShoot.Part = v end)
 makeSlider(pAuto, "FOV (AoS)", 20, 600, 200, function(v) Config.AimOnShoot.FOV = v end)
 
--- MAP
 makeSection(pMap, "Міні-карта")
 makeToggle(pMap, "Увімкнути", true, function(v) Config.Minimap.Enabled = v end)
 makeSlider(pMap, "Розмір", 100, 400, 150, function(v)
     Config.Minimap.Size = v
     if MinimapFrame then MinimapFrame.Size = UDim2.new(0, v, 0, v) end
 end)
-makeSlider(pMap, "Масштаб (10-300)", 10, 300, 50, function(v) Config.Minimap.Scale = v / 100 end)
+makeSlider(pMap, "Масштаб", 10, 300, 50, function(v) Config.Minimap.Scale = v / 100 end)
 makeSlider(pMap, "Розмір точки", 3, 12, 6, function(v) Config.Minimap.DotSize = v end)
 
--- MISC
 makeSection(pMisc, "Рух")
 makeSlider(pMisc, "Швидкість", 16, 200, 16, function(v)
     Config.Misc.WalkSpeed = v
@@ -523,6 +519,7 @@ makeSlider(pMisc, "Сила стрибка", 50, 300, 50, function(v)
     local hum = char and char:FindFirstChildOfClass("Humanoid")
     if hum then hum.JumpPower = v; hum.UseJumpPower = true end
 end)
+
 makeSection(pMisc, "Світ")
 makeToggle(pMisc, "Fullbright", false, function(v)
     Config.Misc.Fullbright = v
@@ -537,21 +534,39 @@ makeToggle(pMisc, "Fullbright", false, function(v)
     end
 end)
 makeToggle(pMisc, "Noclip", false, function(v) Config.Misc.Noclip = v end)
+
 makeSection(pMisc, "HUD")
 makeToggle(pMisc, "Показувати FPS", true, function(v) Config.Misc.ShowFPS = v; FpsLabel.Visible = v end)
 makeToggle(pMisc, "Показувати Ping", true, function(v) Config.Misc.ShowPing = v; PingLabel.Visible = v end)
-makeSection(pMisc, "Продуктивність")
+
+-- ==========================================================
+-- 🥔 POTATO MODE (Basic)
+-- ==========================================================
+local potatoBackup = { objects = {}, lighting = {} }
+
 local function enablePotatoMode()
     pcall(function()
-        Lighting.GlobalShadows = false; Lighting.Brightness = 0.5
+        Lighting.GlobalShadows = false
+        Lighting.Brightness = 0.5
+        Lighting.EnvironmentDiffuseScale = 0
+        Lighting.EnvironmentSpecularScale = 0
+        Lighting.OutdoorAmbient = Color3.fromRGB(80,80,80)
+        Lighting.Ambient = Color3.fromRGB(60,60,60)
+
         for _, v in ipairs(Lighting:GetChildren()) do
-            if v:IsA("PostEffect") or v:IsA("Atmosphere") or v:IsA("Sky") then v.Enabled = false end
+            if v:IsA("PostEffect") or v:IsA("Atmosphere") or v:IsA("Sky") then
+                v.Enabled = false
+            end
         end
+
         local Terrain = workspace:FindFirstChildOfClass("Terrain")
         if Terrain then
-            Terrain.WaterWaveSize = 0; Terrain.WaterWaveSpeed = 0
-            Terrain.WaterReflectance = 0; Terrain.WaterTransparency = 1
+            Terrain.WaterWaveSize = 0
+            Terrain.WaterWaveSpeed = 0
+            Terrain.WaterReflectance = 0
+            Terrain.WaterTransparency = 1
         end
+
         task.spawn(function()
             local n = 0
             for _, obj in ipairs(workspace:GetDescendants()) do
@@ -562,18 +577,89 @@ local function enablePotatoMode()
                     obj.Transparency = 1
                 elseif obj:IsA("BasePart") then
                     obj.Material = Enum.Material.SmoothPlastic
-                    obj.Reflectance = 0; obj.CastShadow = false
+                    obj.Reflectance = 0
+                    obj.CastShadow = false
                 end
                 n += 1
                 if n % 200 == 0 then task.wait() end
             end
         end)
+
         if setfpscap then pcall(function() setfpscap(60) end) end
+        print("🥔 Potato Mode ON")
     end)
 end
+
+-- ==========================================================
+-- 🥔 EXTREME POTATO MODE (FFlags + Sound + Physics)
+-- ==========================================================
+local function enableExtremePotato()
+    pcall(function()
+        -- ===== FFlags =====
+        if setfflag then
+            pcall(function() setfflag("FIntDebugForceMSAASamples", "0") end)
+            pcall(function() setfflag("FIntFRMMinGrassDistance", "0") end)
+            pcall(function() setfflag("FIntFRMMaxGrassDistance", "0") end)
+            pcall(function() setfflag("FIntRenderGrassDetailStrands", "0") end)
+            pcall(function() setfflag("FIntRenderShadowIntensity", "0") end)
+            pcall(function() setfflag("DFIntCullFactorPixelThresholdShadowMapHighQuality", "2147483647") end)
+            pcall(function() setfflag("DFIntCullFactorPixelThresholdShadowMapLowQuality", "2147483647") end)
+            pcall(function() setfflag("FIntRenderLocalLightUpdatesMax", "1") end)
+            pcall(function() setfflag("FIntRenderLocalLightUpdatesMin", "1") end)
+            pcall(function() setfflag("FFlagDebugSkyGray", "true") end)
+            pcall(function() setfflag("DFIntTaskSchedulerTargetFps", "60") end)
+            pcall(function() setfflag("FFlagDisablePostFx", "true") end)
+            pcall(function() setfflag("FFlagNewLightAttenuation", "false") end)
+            pcall(function() setfflag("DFFlagDisableDPIScale", "false") end)
+            pcall(function() setfflag("FFlagFixGraphicsQuality", "true") end)
+        end
+
+        -- ===== Physics =====
+        pcall(function()
+            workspace.PhysicsSteppingMethod = Enum.PhysicsSteppingMethod.Adaptive
+        end)
+        pcall(function()
+            settings().Physics.PhysicsEnvironmentalThrottle = Enum.EnviromentalPhysicsThrottle.Disabled
+            settings().Physics.AllowSleep = true
+        end)
+
+        -- ===== Sounds =====
+        pcall(function()
+            for _, s in ipairs(game:GetService("SoundService"):GetDescendants()) do
+                if s:IsA("Sound") then
+                    s.Volume = 0
+                    if s.IsPlaying then s:Stop() end
+                end
+            end
+        end)
+
+        -- ===== Тіні персонажів =====
+        pcall(function()
+            for _, p in ipairs(Players:GetPlayers()) do
+                if p.Character then
+                    for _, obj in ipairs(p.Character:GetDescendants()) do
+                        if obj:IsA("BasePart") then
+                            obj.CastShadow = false
+                            obj.Material = Enum.Material.SmoothPlastic
+                            obj.Reflectance = 0
+                        end
+                    end
+                end
+            end
+        end)
+
+        print("🥔🔥 EXTREME Potato Mode ON")
+    end)
+end
+
+makeSection(pMisc, "Продуктивність")
 makeToggle(pMisc, "🥔 Картопляний режим", false, function(v)
     Config.Misc.PotatoMode = v
     if v then enablePotatoMode() end
+end)
+makeToggle(pMisc, "🥔🔥 Екстрим режим (FFlags)", false, function(v)
+    Config.Misc.ExtremePotato = v
+    if v then enableExtremePotato() end
 end)
 
 -- ==========================================================
@@ -717,13 +803,11 @@ local function getPart(char, partName)
     return p
 end
 
-local function isVisible(part, ignoreChar)
+local function isVisible(part)
     local origin = Camera.CFrame.Position
     local dir = (part.Position - origin).Unit * (part.Position - origin).Magnitude
     local ray = Ray.new(origin, dir)
-    local ig = {LocalPlayer.Character, part.Parent}
-    if ignoreChar then table.insert(ig, ignoreChar) end
-    local hit = workspace:FindPartOnRayWithIgnoreList(ray, ig, false, true)
+    local hit = workspace:FindPartOnRayWithIgnoreList(ray, {LocalPlayer.Character, part.Parent}, false, true)
     return hit == nil or hit:IsDescendantOf(part.Parent)
 end
 
@@ -773,7 +857,6 @@ local function findTarget(fov, partName, teamCheck, wallCheck, maxDist)
     return closest
 end
 
--- центрова ціль під прицілом (для TriggerBot)
 local function targetUnderCrosshair(teamCheck, wallCheck, maxDist)
     local center = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
     for _, p in ipairs(Players:GetPlayers()) do
@@ -791,7 +874,7 @@ local function targetUnderCrosshair(teamCheck, wallCheck, maxDist)
                         local sp, onScreen = Camera:WorldToViewportPoint(part.Position)
                         if onScreen and sp.Z > 0 then
                             local d = (Vector2.new(sp.X, sp.Y) - center).Magnitude
-                            if d < 30 then -- 30 px точність
+                            if d < 30 then
                                 if not wallCheck or isVisible(part) then
                                     return {part = part, char = char, player = p}
                                 end
@@ -806,19 +889,12 @@ local function targetUnderCrosshair(teamCheck, wallCheck, maxDist)
 end
 
 -- ==========================================================
--- AUTO SHOOT STATE
--- ==========================================================
-local autoShootLast = 0
-local triggerLast = 0
-local aimOnShootLast = 0
-
--- ==========================================================
 -- MAIN LOOP
 -- ==========================================================
+local autoShootLast, triggerLast = 0, 0
 local fpsClock, fpsCount = 0, 0
 
 RunService.RenderStepped:Connect(function(dt)
-    -- FPS/Ping
     fpsCount = fpsCount + 1; fpsClock = fpsClock + dt
     if fpsClock >= 0.5 then
         if Config.Misc.ShowFPS then FpsLabel.Text = "FPS: " .. math.floor(fpsCount / fpsClock) end
@@ -968,7 +1044,6 @@ RunService.RenderStepped:Connect(function(dt)
             end
         end
     end
-
     if shouldAim and LocalPlayer.Character then
         local t = findTarget(Config.Aimbot.FOV, Config.Aimbot.Part, Config.Aimbot.TeamCheck, Config.Aimbot.WallCheck, Config.Aimbot.MaxDistance)
         if t and t.part then
@@ -989,7 +1064,7 @@ RunService.RenderStepped:Connect(function(dt)
         end
     end
 
-    -- AIM ON SHOOT (наводка під час пострілу)
+    -- AIM ON SHOOT
     if Config.AimOnShoot.Enabled and LocalPlayer.Character then
         local keyDown = false
         if typeof(Config.AimOnShoot.Key) == "EnumItem" then
@@ -1006,22 +1081,16 @@ RunService.RenderStepped:Connect(function(dt)
                 Camera.CFrame = camCF:Lerp(CFrame.new(camCF.Position, t.part.Position), 0.5)
             end
         end
-    end
-
-    -- AUTO SHOOT
+    end    -- AUTO SHOOT
     if Config.AutoShoot.Enabled and LocalPlayer.Character then
         local aimActive = true
-        if Config.AutoShoot.OnlyWhenAimActive then
-            if Config.Aimbot.Enabled then
-                if Config.Aimbot.Mode == "Hold" and typeof(Config.Aimbot.Key) == "EnumItem" then
-                    if Config.Aimbot.Key.EnumType == Enum.UserInputType then
-                        aimActive = UserInputService:IsMouseButtonPressed(Config.Aimbot.Key)
-                    else
-                        aimActive = UserInputService:IsKeyDown(Config.Aimbot.Key)
-                    end
+        if Config.AutoShoot.OnlyWhenAimActive and Config.Aimbot.Enabled then
+            if Config.Aimbot.Mode == "Hold" and typeof(Config.Aimbot.Key) == "EnumItem" then
+                if Config.Aimbot.Key.EnumType == Enum.UserInputType then
+                    aimActive = UserInputService:IsMouseButtonPressed(Config.Aimbot.Key)
+                else
+                    aimActive = UserInputService:IsKeyDown(Config.Aimbot.Key)
                 end
-            else
-                aimActive = false
             end
         end
         if aimActive then
@@ -1061,13 +1130,9 @@ RunService.RenderStepped:Connect(function(dt)
         end
     end
 
-    -- MINIMAP
     updateMinimap()
 end)
 
--- ==========================================================
--- КНОПКА МЕНЮ
--- ==========================================================
 UserInputService.InputBegan:Connect(function(input, gpe)
     if gpe then return end
     if input.KeyCode == Enum.KeyCode.K then
@@ -1092,5 +1157,5 @@ LocalPlayer.CharacterAdded:Connect(function(char)
 end)
 
 pcall(function()
-    game.StarterGui:SetCore("SendNotification", {Title = "✨ Neo Menu v6", Text = "Press K", Duration = 5})
+    game.StarterGui:SetCore("SendNotification", {Title = "✨ Neo Menu v7", Text = "Press K", Duration = 5})
 end)
